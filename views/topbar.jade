@@ -1,0 +1,25 @@
+div#topbar
+    a(href="/client/search")
+        div#logo-area
+            div#logo-pic
+                //Nonexistent
+            div#logo-text
+                h1 BATs Force
+    div#intermediary-top-menu-wrapper
+        ul.top-menu-list
+            a(href='/client/search')
+                li.top-menu-item Search
+            a(href='/client/analyze')
+                li.top-menu-item Analyze
+            a(href='/client/my-corpora')
+                li.top-menu-item My Corpora
+            a(href='/client/my-profile')
+                li.top-menu-item My Profile
+            a(href='/logout')
+                li.top-menu-item Logout
+    script.
+        jQuery(document).ready(function () {
+            var item = jQuery("li.top-menu-item:contains(#{page_data})");
+            item.css("background-color", "#006200");
+            item.parent().attr("href", null);
+        });

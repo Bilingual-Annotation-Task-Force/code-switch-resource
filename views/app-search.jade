@@ -1,0 +1,85 @@
+include app-layout
+div#app-main-area
+    div#search-area
+        form#search-form(action="")
+        input#main-search
+        button#submit-button(name="submit" type="submit" value="submit") Search
+        button#extended-search-toggle Show Advanced Search Options
+        div#extended-search-area
+            button#reset-button Reset
+            //Extra options, shown when button is clicked
+    ul#found-list
+        //Populated by search
+
+script.
+    function entry(locals){
+        if (locals.size !== 0) {
+            !{entryTemplate}
+            return template(locals);
+        } else {
+            return "<h1>No Options!</h1>";
+        }
+    }
+    jQuery('#extended-search-toggle').click(function() {
+        var extended = jQuery('#extended-search-area');
+        var buttonText;
+        if (extended.css('visibility') === 'visible') {
+            extended.css('visibility', 'hidden')
+            buttonText = "Show Advanced Search Options";
+        } else {
+            extended.css('visibility', 'visible')
+            buttonText = "Hide Advanced Search Options";
+        }
+        jQuery('#extended-search-toggle').text(buttonText);
+    });
+    jQuery('#submit-button').click(function(event){
+        clicked = true;
+        console.log("Attempting submission of AJAX search form.");
+        jQuery.getJSON('/client/search/search-corpora', getSearchFormData(), function(data, state, jqXHR){
+            console.log(state, jqXHR);
+            //Render all templates
+            var creation = "";
+            var corpora = jqXHR.responseJSON;
+            console.log("Corpora", corpora);
+            var stored = getCookiePairs()['stored'];
+            if (stored === undefined) {
+                stored = [];
+            } else {
+                stored = stored.split(',');
+            }
+            console.log("Stored", stored);
+            for (var i = 0; i < corpora.length; i++) {
+                var corpus = corpora[i];
+                if (stored.includes(corpus._id.toString())) {
+                    console.log(corpus._id, "already stored.");
+                } else {
+                    console.log(corpus._id, "is new.");
+                    creation += entry({descrip : corpus.descrip, datavar : corpus._id, name : corpus.name});
+                }
+            }
+            //Remove old, replace with newly generated
+            jQuery('#found-list').html(creation);
+            jQuery(document).ready(function () {
+                var introduced = jQuery(".entry-box");
+                /*introduced.sortable();
+                introduced.disableSelection();*/
+                introduced.draggable({
+                    revert: true
+                });
+                jQuery(introduced).each(function (index) {
+                    jQuery(this).prop("id", "entry-box-" + index);
+                });
+            });
+        });
+    });
+    function getSearchFormData() {
+        return {"main_input": jQuery("#main-search").val()};
+    }
+
+    var clicked = false;
+    function updateSite(held_elems) {
+        //Later somehow used held_elems to reinsert & sort through template... assuming it's performance is fine
+        if (clicked) {
+            jQuery('#submit-button').click();
+        }
+    }

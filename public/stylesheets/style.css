@@ -1,0 +1,407 @@
+/* CSS clear */
+
+html, body, head, p, h1, h2, h3, h4, h5 {
+    margin: 0;
+    padding: 0;
+    /* TODO Look up the zeroing style sheet later */
+}
+
+/* Main containers styling */
+
+html {
+    height: 100%;
+}
+body {
+    height: 100%;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* Text styling */
+
+body {
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+    color: #000000;
+    font-weight: bold;
+    text-decoration: none;
+}
+a:hover {
+    color: #5b6c6b;
+    text-decoration: underline;
+}
+
+/* Sample work */
+table {
+    background-color: lightblue;
+    border: solid black;
+    border-radius: 10%;
+}
+thead {
+    border: solid lightblue;
+    border-radius: 10%;
+}
+th {
+    font-weight: bold;
+    border-bottom-left-radius: 10%;
+    border: solid black thin;
+}
+
+/* Top-bar -- general */
+#topbar {
+    height: 5em;
+
+    background: #393939;
+
+    line-height: 5em;
+    vertical-align: bottom;
+}
+#logo-area {
+    display: inline-block;
+    height: 100%;
+}
+#logo-text {
+    display: inline-block;
+    margin-right: 2em;
+    margin-left: 2em;
+
+    color: #ffffff;
+}
+#logo-text > h1 {
+    font-weight: 500;
+}
+#logo-pic {
+    display: inline-block;
+}
+/* Topbar -- initial */
+#slogan-area {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 5em;
+    -webkit-transform: translate(-50%);
+    -moz-transform: translate(-50%);
+    -ms-transform: translate(-50%);
+    -o-transform: translate(-50%);
+    transform: translate(-50%);
+}
+#slogan-text {
+    display: inline-block;
+    height: 100%;
+
+    color: #dcdcdc;
+}
+#slogan-text > h2 {
+    font-weight: 100;
+}
+#log-button-pair {
+    display: inline-block;
+    height: 3em;
+
+    position: absolute;
+    right: 0;
+    margin-right: 2em;
+    top: 1em;
+
+    text-align: right;
+    line-height: 3em;
+    vertical-align: middle;
+}
+#log-left-button {
+    display: inline-block;
+    height: 100%;
+
+    background: #1fa200;
+
+    color: white;
+    border-right: solid;
+    border-color: #5b6c6b;
+    border-top-left-radius: 1.5em;
+    border-bottom-left-radius: 1.5em;
+}
+#log-right-button {
+    display: inline-block;
+    height: 100%;
+
+    background: #1fa200;
+
+    color: white;
+    border-left: solid;
+    border-color: #5b6c6b;
+    border-top-right-radius: 1.5em;
+    border-bottom-right-radius: 1.5em;
+}
+#log-left-button:hover {
+    background: #1a8900;
+    border-color: #4f5e5d;
+
+    text-decoration: none;
+}
+#log-right-button:hover {
+    background: #1a8900;
+    border-color: #4f5e5d;
+
+    text-decoration: none;
+}
+#log-left-button-text {
+    height: 100%;
+
+    padding-left: 1.5em;
+    padding-right: 1em;
+
+    font-size: 1.5em;
+
+    color: white;
+}
+#log-right-button-text {
+    height: 100%;
+
+    padding-right: 1.5em;
+    padding-left: 1em;
+
+    font-size: 1.5em;
+
+    color: white;
+}
+
+/* Main page */
+#front-wrapper {
+    display: block;
+    height: calc(100vh - 5em);
+}
+#front-center-wrapper {
+
+    text-align: center;
+    line-height: calc(100vh - 5em);
+}
+#front-msg1 {
+    display: inline-block;
+
+    width: 100%;
+
+    text-align: center;
+
+    vertical-align: middle;
+    line-height: normal;
+}
+.front-h1 {
+    display: inline-block;
+
+    max-width: 75%;
+
+    font-size: 5.5em;
+    color: #393939;
+    text-align: center;
+    font-weight: 300;
+}
+.front-h2 {
+    display: inline-block;
+
+    max-width: 75%;
+
+    font-size: 4.5em;
+    color: #393939;
+    text-align: center;
+    font-weight: 200;
+}
+#front-page-spacer {
+    display: inline-block;
+    margin-top: 2em;
+    margin-bottom: 2em;
+
+    width: 60%;
+    height: 2.5em;
+
+    text-align: center;
+    background: #393939;
+}
+.front-button {
+    display: inline-block;
+    margin-top: 1em;
+    margin-bottom: 1em;
+
+    min-width: 25%;
+    height: 10em;
+
+    background: #393939;
+
+    font-size: 1em;
+
+    text-align: center;
+    color: white;
+
+    border: solid #393939;
+    border-radius: 5em;
+}
+.front-button > p {
+    margin-right: 2em;
+    margin-left: 2em;
+
+    font-size: 2.5em;
+
+    line-height: 4em;
+
+    vertical-align: top;
+}
+.front-button:hover {
+    background: #1fa200;
+    font-size: 1em;
+    color: white;
+    text-decoration: none;
+}
+.front-link {
+    font-size: 1.5em;
+    color: #4f5e5d;
+    text-decoration: underline;
+}
+.front-link:hover {
+    color: #1fa200;
+}
+
+/* Login/Signup page */
+#login-wrapper {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+#signup-wrapper {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+
+/* App components */
+/* Topbar */
+#intermediary-top-menu-wrapper {
+    position: absolute;
+    display: inline-block;
+    top: 0;
+    right: 0;
+    width: 75%;
+    height: 5em;
+}
+.top-menu-list {
+    display: inline-block;
+    position: absolute;
+    padding: 0 2em 0 0;
+    right: 0;
+    margin: 0;
+}
+.top-menu-list > a {
+    display: inline-block;
+    margin: 0;
+}
+.top-menu-list > a:hover {
+    display: inline-block;
+    background: #1fa200;
+}
+.top-menu-item {
+    display: inline-block;
+    padding: 0 2em;
+
+    line-height: 5em;
+    color: #ffffff;
+}
+.top-menu-text {
+    display: inline-block;
+
+    line-height: 5em;
+    vertical-align: middle;
+}
+
+/* Sidebar */
+#sidebar {
+    float: left;
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 25%;
+    height: calc(100% - 5em);
+
+    padding: 3em 2em;
+
+    border: 0.5em #4f5e5d;
+    border-right-style: solid;
+}
+#corpus-held-list {
+    padding: 0;
+    list-style-type: none;
+}
+.side-menu-item {
+
+}
+.side-menu-text {
+
+
+}
+#dump-stored-corpora {
+    position: absolute;
+    bottom: 2em;
+    left: calc(25% - 2em);
+    -webkit-transform: translate(-100%);
+    -moz-transform: translate(-100%);
+    -ms-transform: translate(-100%);
+    -o-transform: translate(-100%);
+    transform: translate(-100%);
+}
+
+/* Main work area */
+#app-main-area {
+    z-index: 99;
+    float: right;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: inline-block;
+    width: 75%;
+    height: calc(100% - 5em);
+    padding: 3em;
+
+    overflow: auto;
+}
+
+/* Main 0 -- Search */
+#extended-search-area {
+    visibility: hidden;
+}
+#found-list {
+    position: absolute;
+    padding: 0;
+    list-style-type: none;
+}
+.entry-box {
+
+}
+.corpus-hidden-id {
+    visibility: hidden;
+    position: absolute;
+}
+
+/* Main 1 -- Analyze */
+
+/* Main 2 -- My Corpora */
+
+/* Main 3 -- Profile */
+#personal-info-area {
+
+}
+#photo-area {
+
+}

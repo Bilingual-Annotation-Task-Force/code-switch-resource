@@ -1,0 +1,105 @@
+div#sidebar
+    button#select-all-sidebar(type="default") Select all//TODO
+    ul#corpus-held-list
+    button#dump-stored-corpora Clear working slate
+
+script.
+    function sidebarEntry(locals) {
+        if (locals.size !== 0) {
+            !{sidebarEntryTemplate};
+            return template(locals);
+        } else {
+            return "<h1>No Options!</h1>";
+        }
+    }
+
+    jQuery(document).ready(function () {
+        //Ajax it all
+        var stored = getCookiePairs()['stored'];
+        if (!(stored === undefined || stored.length === 0)) {
+            jQuery.getJSON('/client/corpora/simple/' + stored, function (data, state, jqXHR) {
+                //Now what?
+                console.log(jqXHR.responseJSON);
+                var generated = "";
+                if (jqXHR.responseJSON.size !== 0) {
+                    for (var hi in jqXHR.responseJSON) {
+                        var corpus = jqXHR.responseJSON[hi];
+                        corpus['datavar'] = corpus['_id'];
+                        generated += sidebarEntry(corpus);
+                    }
+                }
+                jQuery('#corpus-held-list').html(generated);
+                jQuery('.side-multi-select').change(function () {
+                    updateChecked(this, jQuery('.side-multi-select'));
+                });
+            });
+        }
+    });
+
+    jQuery('#sidebar').droppable({
+        drop : function(event, ui) {
+            //TODO add check for repeats and ignore them
+            var draggedDOM = ui.draggable[0];
+            var placedId = jQuery(jQuery(draggedDOM).children()[3]).text();
+            console.log("Placed id: " + placedId);
+            jQuery(ui.draggable[0]).remove();
+            //TODO Recover entry-box objects
+            jQuery.getJSON('/client/corpus/simple/' + placedId, function(data, state, jqXHR){
+                console.log("AJAX fetched corpus: ", jqXHR.responseJSON);
+                var pairs = getCookiePairs();
+                if (pairs['stored'] === undefined || pairs['stored'] === null || pairs['stored'].length === 0) {
+                    //Newest entry
+                    document.cookie = "stored="+placedId;
+                } else {
+                    //append entry
+                    document.cookie = "stored="+pairs['stored']+","+placedId;
+                }
+            });
+            console.log(jQuery(draggedDOM).html());
+            var held_list = jQuery('#corpus-held-list');
+            jQuery(draggedDOM).removeAttr('draggable');
+            held_list.append(sidebarEntry({
+                name : jQuery(jQuery(draggedDOM).children()[1]).text(),
+                descrip : jQuery(jQuery(draggedDOM).children()[2]).text(),
+                datavar : jQuery(jQuery(draggedDOM).children()[3]).text()
+            }));
+            jQuery('.side-multi-select').off('change').change(function () {
+                updateChecked(this, jQuery('.side-multi-select'));
+            });
+        },
+        accept : ".entry-box"
+    });
+    jQuery('#dump-stored-corpora').click(function () {
+        //Dump vars from cookie
+        var held_list = jQuery('#corpus-held-list');
+        if (held_list.html() !== "") {
+            if (quantChecked === 0) { //Remove all
+                dumpCookie('stored');
+                var held_elem = held_list.html();
+                held_list.html("");
+                //This can be smarter.
+                updateSite(held_elem);
+            } else { //Remove selected
+
+            }
+        }
+    });
+    function clearSidebar() {
+        jQuery('#dump-stored-corpora').click();
+    }
+
+    var quantChecked = 0;
+    function updateChecked(elem, query) {
+        if (jQuery(elem).is(':checked')) {
+            quantChecked++;
+        } else {
+            quantChecked--;
+        }
+        jQuery('#dump-stored-corpora').text(
+            (quantChecked === 0 ? "Clear working data" : "Clear selected data")
+        );
+    }
+
+    jQuery('#select-all-sidebar').click(function () {
+        jQuery('.side-multi-select').click();
+    });

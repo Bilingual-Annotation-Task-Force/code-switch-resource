@@ -1,0 +1,32 @@
+include layout
+    include topbar-front
+
+    div#login-wrapper
+        div#data-box
+            h1 Login
+            p or&nbsp;
+                a(href="/signup") Sign Up
+        div#login-box
+            form.login-form(action="/login-check" method="post")
+                table
+                    tr
+                        td
+                            label.username-field-label(for="username-field") Username:
+                        td
+                            input.username-field(type="text", id="name", name="username")
+                    tr
+                        td
+                            label.password-field-label(for="password-field") Password:
+                        td
+                            input.password-field(type="password", id="password", name="password")
+                    tr
+                        td
+                        td
+                            button.submit-login(type="submit") Login
+        div#supplement-box
+
+
+script.
+    jQuery(document).ready(function(){
+        //TODO if failed exists, figure out error and print message
+    });
