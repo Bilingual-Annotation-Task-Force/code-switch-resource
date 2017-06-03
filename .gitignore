@@ -48,7 +48,6 @@ Temporary Items
 
 # Webstorm
 .idea/
-app.js
 bin/
 data/
 launchmongo.bat
