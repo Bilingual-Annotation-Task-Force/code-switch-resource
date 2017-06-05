@@ -1,0 +1,51 @@
+# Paths:
+    GET /
+    
+    GET /signup
+    POST /signup-check
+    
+    GET /login
+    POST /login-check
+    
+    GET /login-failed
+    GET /signup-failed
+    
+    GET /landing
+    
+    GET /logout
+    
+    /client
+        # basic paths
+        GET /client/search
+        GET /client/analyze
+        GET /client/my-corpora
+        GET /client/my-profile  # Extension of /client/profile/:profileId where profileId is the profile currently logged in
+        
+        /profile
+            # Profiles
+            GET /client/profile
+            GET /client/profile/:profileId
+            GET /client/profile/:profileId/simple
+            
+            PUT /client/profile/:profileId/subscribe
+            
+        /corpus|/corpora
+            GET /client/corpus/
+            GET /client/corpus/:corpusId
+            GET /client/corpus/:corpusId/simple
+            
+            GET /client/corpora/
+            GET /client/corpora/:corpusIdList
+            GET /client/corpora/:corpusIdList/simple
+        
+        /analyze
+            GET /client/analyze/:corpusId/:scriptNum/simple/
+        
+        /search
+            GET /client/search/corpora
+            
+        /my-corpora
+            POST /client/my-corpora/upload
+            
+        /my-profile
+            POST /client/my-profile/update

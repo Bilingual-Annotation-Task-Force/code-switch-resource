@@ -14,7 +14,9 @@
     "mongodb": "latest",
     "monk": "latest",
     "morgan": "~1.8.1",
+    "pug": "^2.0.0-rc.2",
     "rbroker": "^8.0.5",
-    "serve-favicon": "~2.4.2"
+    "serve-favicon": "~2.4.2",
+    "multer": "latest"
   }
 }

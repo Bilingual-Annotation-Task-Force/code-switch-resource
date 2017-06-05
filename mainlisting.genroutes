@@ -1,0 +1,84 @@
+router.get('/', function(req, res, next){
+	
+});
+router.get('/signup', function(req, res, next){
+	
+});
+router.post('/signup-check', function(req, res, next){
+	
+});
+router.get('/login', function(req, res, next){
+	
+});
+router.post('/login-check', function(req, res, next){
+	
+});
+router.get('/login-failed', function(req, res, next){
+	
+});
+router.get('/signup-failed', function(req, res, next){
+	
+});
+router.get('/landing', function(req, res, next){
+	
+});
+router.get('/logout', function(req, res, next){
+	
+});
+router.get('/client/search', function(req, res, next){
+	
+});
+router.get('/client/analyze', function(req, res, next){
+	
+});
+router.get('/client/my-corpora', function(req, res, next){
+	
+});
+router.get('/client/my-profile', function(req, res, next){
+	
+});
+router.get('/client/profile', function(req, res, next){
+	
+});
+router.get('/client/profile/:profileId', function(req, res, next){
+	
+});
+router.get('/client/profile/:profileId/simple', function(req, res, next){
+	
+});
+router.put('/client/profile/:profileId/subscribe', function(req, res, next){
+	
+});
+router.get('/client/corpus/', function(req, res, next){
+	
+});
+router.get('/client/corpus/:corpusId', function(req, res, next){
+	
+});
+router.get('/client/corpus/:corpusId/simple', function(req, res, next){
+	
+});
+router.get('/client/corpora/', function(req, res, next){
+	
+});
+router.get('/client/corpora/:corpusIdList', function(req, res, next){
+	
+});
+router.get('/client/corpora/:corpusIdList/simple', function(req, res, next){
+	
+});
+router.get('/client/analyze/:corpusId/:scriptNum/simple/', function(req, res, next){
+	
+});
+router.post('/client', function(req, res, next){
+	
+});
+router.get('/client/search/corpora', function(req, res, next){
+	
+});
+router.post('/client/my-corpora/upload', function(req, res, next){
+	
+});
+router.post('/client/my-profile/update', function(req, res, next){
+	
+});

@@ -1,4 +1,5 @@
 include app-layout
+
 div#app-main-area
     div#search-area
         form#search-form(action="")
@@ -35,7 +36,7 @@ script.
     jQuery('#submit-button').click(function(event){
         clicked = true;
         console.log("Attempting submission of AJAX search form.");
-        jQuery.getJSON('/client/search/search-corpora', getSearchFormData(), function(data, state, jqXHR){
+        jQuery.getJSON('/client/search/corpora', getSearchFormData(), function(data, state, jqXHR){
             console.log(state, jqXHR);
             //Render all templates
             var creation = "";
@@ -73,7 +74,12 @@ script.
         });
     });
     function getSearchFormData() {
-        return {"main_input": jQuery("#main-search").val()};
+        var val = jQuery("#main-search").val();
+        if (val.length == 0) {
+            return {};
+        } else {
+            return {"main_input": val};
+        }
     }
 
     var clicked = false;

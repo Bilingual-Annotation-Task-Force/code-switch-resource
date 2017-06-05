@@ -1,5 +1,5 @@
 include layout
-    include topbar-front
+    include basic-topbar
 
     div#login-wrapper
         div#data-box
@@ -7,7 +7,7 @@ include layout
             p or&nbsp;
                 a(href="/signup") Sign Up
         div#login-box
-            form.login-form(action="/login-check" method="post")
+            form.login-form(action="/login" method="post")
                 table
                     tr
                         td
@@ -27,6 +27,7 @@ include layout
 
 
 script.
-    jQuery(document).ready(function(){
+    jQuery(document).ready(function () {
+        history.replaceState(null, null, window.location.href.split('?')[0]);
         //TODO if failed exists, figure out error and print message
     });

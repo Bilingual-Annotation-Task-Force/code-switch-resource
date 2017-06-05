@@ -1,0 +1,76 @@
+include app-layout
+
+div#app-main-area
+    div#personal-contact-area
+        h1 Your Information
+        div#profile-photo-area
+            img#profile-img(src="/public/images/" + profile._id + "/profile")
+        h2 Name: #{profile.username}
+        h2 Email: #{profile.email}
+        if profile.phonenumber === undefined || profile.phonenumber === undefined === null
+            h2 Phone numbers: Undefined
+        else
+            h2 Phone numbers:
+            if profile.phonenumber.cell === undefined || profile.phonenumber.cell === null
+                h3 cell: Undefined
+            else
+                h3 cell: #{profile.phonenumber.cell}
+            if profile.phonenumber.home === undefined || profile.phonenumber.home === null
+                h3 home: Undefined
+            else
+                h3 home: #{profile.phonenumber.home}
+            if profile.phonenumber.work === undefined || profile.phonenumber.work === null
+                h3 work: Undefined
+            else
+                h3 work: #{profile.phonenumber.work}
+        if profile.affiliation === undefined || profile.affiliation === null
+            h2 Affiliation: Undfined
+        else
+            h2 Affiliation: #{profile.affiliation}
+        //Personal information here
+    div#corpora-and-subs-area
+        h1 Owned Corpora
+        ul#corpora-area
+            //List corpora or spawn dynamically here
+        h1 Subscribed corpora
+        ul#sub-area
+
+script.
+    function profileSubscribedEntry(locals) {
+        if (locals.size !== 0) {
+            !{profileSubscribedEntryTemplate};
+            return template(locals);
+        } else {
+            return "<h1>No Options!</h1>";
+        }
+    }
+
+    function loadCorpora() {
+        //JQuery stuff here
+        jQuery.getJSON('/client/my-profile/corpora/owned/simple', {region: "hahaha"}, function (data, state, jqXHR) {
+            console.log(jqXHR.responseJSON);
+            var generated = "";
+            if (jqXHR.responseJSON.size !== 0) {
+                for (var i in jqXHR.responseJSON) {
+                    var corpus = jqXHR.responseJSON[i];
+                    corpus['datavar'] = corpus['_id'];
+                    generated += profileSubscribedEntry(corpus);
+                }
+            }
+            jQuery('#corpora-area').html(generated);
+        });
+        jQuery.getJSON('/client/my-profile/corpora/subscribed/simple', {region: "seconded"}, function (data, state, jqXHR) {
+            console.log(jqXHR.responseJSON);
+            var generated = "";
+            if (jqXHR.responseJSON.size !== 0) {
+                for (var i in jqXHR.responseJSON) {
+                    var corpus = jqXHR.responseJSON[i];
+                    corpus['datavar'] = corpus['_id'];
+                    generated += profileSubscribedEntry(corpus);
+                }
+            }
+            jQuery('#sub-area').html(generated);
+        });
+    };
+    jQuery(document).ready(loadCorpora);
+    //TODO stuff here
