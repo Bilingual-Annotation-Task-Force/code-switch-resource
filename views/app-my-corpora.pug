@@ -1,10 +1,26 @@
 include app-layout
 
 div#app-main-area
-    form(method="post", enctype="multipart/form-data", action="/client/my-corpora/upload")
+    form#upload-form(method="post", enctype="multipart/form-data", action="/client/my-corpora/upload")
         p
             input(type="text", name="title", placeholder="title")
+        p
+            input(type="textarea", name="descrip", placeholder="hahah")
         p
             input(type="file", name="corpus_data")
         p
             input(type="submit")
+
+
+script.
+    jQuery('#upload-form').submit(function (e) {
+        e.preventDefault();
+        var form = new FormData(jQuery('#upload-form')[0]);
+        jQuery.ajax({
+            type: 'POST',
+            url: '/client/my-corpora/upload',
+            data: form,
+            processData: false,
+            contentType: false
+        });
+    });

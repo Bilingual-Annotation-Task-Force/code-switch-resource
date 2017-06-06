@@ -14,6 +14,10 @@ var db = monk('localhost:27017/bats-user');
 //Directory info about basic javascript files
 var index = require('./routes/index');
 
+//Max sockets
+var http = require('http');
+http.globalAgent.maxSockets = Infinity;
+
 //Setup the app after requiring everything
 var app = express();
 

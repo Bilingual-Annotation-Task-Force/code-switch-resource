@@ -15,25 +15,43 @@ script.
 
     jQuery(document).ready(function () {
         //Ajax it all
-        var stored = getCookiePairs()['stored'];
-        if (!(stored === undefined || stored.length === 0)) {
-            jQuery.getJSON('/client/corpora/simple' + stored, function (data, state, jqXHR) {
-                //Now what?
-                console.log(jqXHR.responseJSON);
-                var generated = "";
-                if (jqXHR.responseJSON.size !== 0) {
-                    for (var hi in jqXHR.responseJSON) {
+        fetchIdSubList(function () {
+            var stored = getCookiePairs()['stored'];
+            if (!(stored === undefined || stored.length === 0)) {
+                jQuery.getJSON('/client/corpora/simple/' + stored, function (data, state, jqXHR) {
+                    //Now what?
+                    console.log(jqXHR.responseJSON);
+                    var generated = "";
+                    for (var hi = 0; hi < jqXHR.responseJSON.length; hi++) {
                         var corpus = jqXHR.responseJSON[hi];
                         corpus['datavar'] = corpus['_id'];
-                        generated += sidebarEntry(corpus);
+                        if (idSubList.indexOf(corpus['datavar']) != -1) {
+                            console.log(corpus['datavar'], "is in", idSubList);
+                            corpus['buttontext'] = 'Remove subscription';
+                        } else {
+                            console.log(corpus['datavar'], "is not in", idSubList);
+                            corpus['buttontext'] = 'Subscribe';
+                        }
+                        generated += sidebarEntry(corpus).replace('Arandomanduniqueverylongstringthatprobablywontbeduplicated', corpus['buttontext']);
                     }
-                }
-                jQuery('#corpus-held-list').html(generated);
-                jQuery('.side-multi-select').change(function () {
-                    updateChecked(this, jQuery('.side-multi-select'));
+                    jQuery('#corpus-held-list').html(generated);
+                    jQuery('.side-multi-select').change(function () {
+                        updateChecked(this, jQuery('.side-multi-select'));
+                    });
+                    jQuery('.subscription-sidebar-toggle').click(function () {
+                        //Do stuff here
+                        var corpusString = jQuery(this).siblings('.corpus-hidden-id').text();
+                        if (jQuery(this).attr('value') === 'Subscribe') {
+                            addSubscrip(corpusString);
+                            jQuery(this).attr('value', 'Remove Subscription')
+                        } else {
+                            removeSubscrip(corpusString);
+                            jQuery(this).attr('value', 'Subscribe')
+                        }
+                    })
                 });
-            });
-        }
+            }
+        });
     });
 
     jQuery('#sidebar').droppable({
@@ -58,13 +76,32 @@ script.
             console.log(jQuery(draggedDOM).html());
             var held_list = jQuery('#corpus-held-list');
             jQuery(draggedDOM).removeAttr('draggable');
-            held_list.append(sidebarEntry({
-                name : jQuery(jQuery(draggedDOM).children()[1]).text(),
-                descrip : jQuery(jQuery(draggedDOM).children()[2]).text(),
-                datavar : jQuery(jQuery(draggedDOM).children()[3]).text()
-            }));
+            var created = sidebarEntry({
+                name: jQuery(jQuery(draggedDOM).children()[1]).text(),
+                descrip: jQuery(jQuery(draggedDOM).children()[2]).text(),
+                datavar: placedId
+            });
+            if (idSubList.indexOf(placedId) != -1) {
+                console.log("No subscription.");
+                created = created.replace('Arandomanduniqueverylongstringthatprobablywontbeduplicated', 'Remove Subscription');
+            } else {
+                console.log("Subscription.");
+                created = created.replace('Arandomanduniqueverylongstringthatprobablywontbeduplicated', 'Subscribe');
+            }
+            held_list.append(created);
             jQuery('.side-multi-select').off('change').change(function () {
                 updateChecked(this, jQuery('.side-multi-select'));
+            });
+            jQuery('.subscription-sidebar-toggle').off('click').click(function () {
+                //Do stuff here
+                var corpusString = jQuery(this).siblings('.corpus-hidden-id').text();
+                if (jQuery(this).attr('value') === 'Subscribe') {
+                    addSubscrip(corpusString);
+                    jQuery(this).attr('value', 'Remove Subscription');
+                } else {
+                    removeSubscrip(corpusString);
+                    jQuery(this).attr('value', 'Subscribe');
+                }
             });
         },
         accept : ".entry-box"

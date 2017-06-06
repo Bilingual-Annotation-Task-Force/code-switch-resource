@@ -36,6 +36,14 @@ div#app-main-area
         ul#sub-area
 
 script.
+    function profileOwnedEntry(locals) {
+        if (locals.size !== 0) {
+            !{profileOwnedEntryTemplate};
+            return template(locals);
+        } else {
+            return "<h1>No Options!</h1>";
+        }
+    }
     function profileSubscribedEntry(locals) {
         if (locals.size !== 0) {
             !{profileSubscribedEntryTemplate};
@@ -45,8 +53,7 @@ script.
         }
     }
 
-    function loadCorpora() {
-        //JQuery stuff here
+    function reloadOwned() {
         jQuery.getJSON('/client/my-profile/corpora/owned/simple', {region: "hahaha"}, function (data, state, jqXHR) {
             console.log(jqXHR.responseJSON);
             var generated = "";
@@ -54,11 +61,14 @@ script.
                 for (var i in jqXHR.responseJSON) {
                     var corpus = jqXHR.responseJSON[i];
                     corpus['datavar'] = corpus['_id'];
-                    generated += profileSubscribedEntry(corpus);
+                    generated += profileOwnedEntry(corpus);
                 }
             }
             jQuery('#corpora-area').html(generated);
+
         });
+    }
+    function reloadSubscribed() {
         jQuery.getJSON('/client/my-profile/corpora/subscribed/simple', {region: "seconded"}, function (data, state, jqXHR) {
             console.log(jqXHR.responseJSON);
             var generated = "";
@@ -70,7 +80,18 @@ script.
                 }
             }
             jQuery('#sub-area').html(generated);
+            var buttons = jQuery(".subscription-removal-button");
+            buttons.off('click');
+            buttons.click(function () {
+                jQuery(this).parent().remove();
+                removeSubscrip(jQuery(this).siblings('.corpus-hidden-id').text());
+            })
         });
+    }
+
+    function loadCorpora() {
+        reloadOwned();
+        reloadSubscribed();
     };
     jQuery(document).ready(loadCorpora);
     //TODO stuff here

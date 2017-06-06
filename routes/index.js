@@ -34,7 +34,9 @@ const sessioncookie = 'logintoken';
 //Generated templates
 var searchFn = false;
 var sidebarFn = false;
-var profileFn = false;
+var profileOwnedFn = false;
+var profileSubscribedFn = false;
+//TODO refactor out the repeated code
 function genTemplates() {
     console.log("Generating client-side jade javascript functions.");
     var templatePath = path.normalize(path.join(__dirname.substr(0, __dirname.lastIndexOf(path.sep)), 'views', 'app-search-entry.pug'));
@@ -49,11 +51,17 @@ function genTemplates() {
         if (err !== null) console.log("Error from file read:", err);
         else sidebarFn = jade.compileClient(data, null);
     });
-    templatePath = path.normalize(path.join(__dirname.substr(0, __dirname.lastIndexOf(path.sep)), 'views', 'app-profile-entry.pug'));
+    templatePath = path.normalize(path.join(__dirname.substr(0, __dirname.lastIndexOf(path.sep)), 'views', 'app-profile-owned-entry.pug'));
     fs.readFile(templatePath, "ASCII", function (err, data) {
         console.log("Generating client-side sidebar entry templates.");
         if (err !== null) console.log("Error from file read:", err);
-        else profileFn = jade.compileClient(data, null);
+        else profileOwnedFn = jade.compileClient(data, null);
+    });
+    templatePath = path.normalize(path.join(__dirname.substr(0, __dirname.lastIndexOf(path.sep)), 'views', 'app-profile-subscribed-entry.pug'));
+    fs.readFile(templatePath, "ASCII", function (err, data) {
+        console.log("Generating client-side sidebar entry templates.");
+        if (err !== null) console.log("Error from file read:", err);
+        else profileSubscribedFn = jade.compileClient(data, null);
     });
 }
 genTemplates();
@@ -78,7 +86,6 @@ function signup(db, enteredAccount, response) {
             login(enteredAccount, undefined, response, true);
             response.redirect('/landing');
         } else {
-            //TODO add failed var to cookie
             console.log("Submitted record is a duplicate.");
             logout(response);
             console.log("Redirecting to the signup page.");
@@ -302,18 +309,34 @@ router.get('/client/analyze/:corpusId/:rScriptId/simple/', function(req, res, ne
 //endregion
 //region Owned and subscribed corpora
 
-router.get('/client/my-corpora', function(req, res, next){
+router.get('/client/my-corpora', function(req, res){
     res.render('app-my-corpora', {title: "My Corpora", page_data: "My Corpora", sidebarEntryTemplate: sidebarFn});
 });
-router.post('/client/my-corpora/upload', multer({dest: './uploads'}).single('corpus_data'), function(req, res, next){
+router.post('/client/my-corpora/upload', multer({dest: './uploads'}).single('corpus_data'), function(req, res){
     console.log(req.body); //form fields
     console.log(req.file); //form files
+    if (req.file !== undefined && req.file !== null) {
+        var corpus = {
+            //TODO parse data
+            owner: req.cookies[sessioncookie],
+            filename: req.file.filename
+        };
+        console.log(corpus);
+        req.db.collection(corporadbname).insert(corpus, null, function () {
+            console.log(corpus, "inserted.");
+            req.db.collection(corporadbname).find({filename: req.file.filename}, {}, function (e, docs) {
+                console.log("Corpus found.\n\tErrors: ", e,
+                    "\n\tFound corpora: \n\t" + JSON.stringify(docs, undefined, "\t").replace(/\n/g, "\n\t"));
+                req.db.collection(userdbname).update({_id: req.cookies[sessioncookie]}, {$addToSet: {owned: docs[0]['_id']}}, function (e, docs) {
+                    console.log("User updated for ownership.");
+                });
+            });
+        });
 
-    //TODO log multer data to db, save as a corpus with the provided form dat (check form data)
-    //TODO amend form to use data
-
+        //TODO spawn a process to run all the scripts on the file
+    }
     //Terminate wait
-    res.status(204).end()
+    res.status(204).end();
 });
 
 //endregion
@@ -324,7 +347,11 @@ router.get('/client/my-profile', function(req, res){
         console.log("Account query completed.\n\tErrors: ", e,
             "\n\tEntries found during page view: \n\t" + ((JSON.stringify(docs, undefined, "\t")).replace(/\n/g, "\n\t")));
         res.render('app-profile', {title: "My Profile", page_data: "My Profile",
-            account: docs[0], sidebarEntryTemplate: sidebarFn, profileSubscribedEntryTemplate: profileFn, profile: docs[0]});
+            account: docs[0],
+            sidebarEntryTemplate: sidebarFn,
+            profileSubscribedEntryTemplate: profileSubscribedFn,
+            profileOwnedEntryTemplate: profileOwnedFn,
+            profile: docs[0]});
     });
 });
 router.post('/client/my-profile', function(req, res){
@@ -395,12 +422,16 @@ router.get('/client/profile/:profileId', function(req, res){
             if (docs.length !== 1) {
                 res.redirect(404, '/');
             } else {
-                res.render('app-profile', {title: "Profile", page_data: "No profile", profile: docs[0], sidebarEntryTemplate: sidebarFn});
+                res.render('app-profile', {title: "Profile", page_data: "No profile", profile: docs[0],
+                    sidebarEntryTemplate: sidebarFn,
+                    profileSubscribedEntryTemplate: profileSubscribedFn,
+                    profileOwnedEntryTemplate: profileOwnedFn
+                });
             }
         });
     }
 });
-router.get('/client/profile/:profileId/simple', function(req, res, next){
+router.get('/client/profile/simple/:profileId', function(req, res, next){
     req.db.collection(userdbname).find({"_id": req.params.profileId}, {}, function (e, docs) {
         if (docs.length !== 1) {
             res.redirect(404, '/');
@@ -418,7 +449,7 @@ router.get('/client/corpus/simple', function(req, res){
     //Do nothing
     res.send("");
 });
-router.get('/client/corpus/:corpusId', function(req, res, next){
+router.get('/client/corpus/:corpusId', function(req, res){
     req.db.collection(corporadbname).find(req.params.corpusId, {}, function (e, docs) {
         console.log("Corpus query completed.\n\tErrors: ", e,
             "\n\tEntries found during corpus search: \n\t" + ((JSON.stringify(docs, undefined, "\t")).replace(/\n/g, "\n\t")));
@@ -426,7 +457,7 @@ router.get('/client/corpus/:corpusId', function(req, res, next){
         res.send("");
     });
 });
-router.get('/client/corpus/simple/:corpusId', function(req, res, next){
+router.get('/client/corpus/simple/:corpusId', function(req, res){
     req.db.collection(corporadbname).find(req.params.corpusId, {}, function (e, docs) {
         console.log("Corpus query (simple) completed.\n\tErrors: ", e,
             "\n\tEntries found during corpus search: \n\t" + ((JSON.stringify(docs, undefined, "\t")).replace(/\n/g, "\n\t")));
@@ -434,11 +465,10 @@ router.get('/client/corpus/simple/:corpusId', function(req, res, next){
     });
 });
 //Copora
-router.get('/client/corpora/simple/:corpusIdList', function(req, res, next){
+router.get('/client/corpora/simple/:corpusIdList', function(req, res){
     req.db.collection(corporadbname).find({_id: { $in: req.params.corpusIdList.split(',') }}, {}, function (e, docs) {
         console.log("Corpora query (simple) completed.\n\tErrors: ", e,
             "\n\tEntries found during corpora list search: \n\t" + ((JSON.stringify(docs, undefined, "\t")).replace(/\n/g, "\n\t")));
-        console.log(docs);
         res.send(docs);
     });
 });
@@ -446,11 +476,29 @@ router.get('/client/corpora/simple/:corpusIdList', function(req, res, next){
 //endregion
 //region Subscription
 
-router.put('/client/subscribe/:corpusId', function(req, res, next){
-    //TODO add profileId to the client
+router.put('/client/subscribe/:corpusId', function (req, res) {
+    req.db.collection(userdbname).update({_id: req.cookies[sessioncookie]}, {$addToSet: {subscribed: req.params.corpusId}}, function (e, docs) {
+        console.log("Subscription addition completed.\n\tErrors: ", e,
+            "\n\tEntries found during subscription search: \n\t" + ((JSON.stringify(docs, undefined, "\t")).replace(/\n/g, "\n\t")));
+    });
+    req.db.collection(corporadbname).update({_id: req.params.corpusId}, {$addToSet: {subscribed: req.cookies[sessioncookie]}}, function (e, docs) {
+        console.log("Subscription addition completed.\n\tErrors: ", e,
+            "\n\tEntries found during subscription search: \n\t" + ((JSON.stringify(docs, undefined, "\t")).replace(/\n/g, "\n\t")));
+    });
+    res.status(204).end();
 });
-router.delete('/client/subscribe/:corpusId', function(req, res, next){
-    //TODO remove subscription
+router.delete('/client/subscribe/:corpusId', function(req, res){
+    console.log("Removing", req.params.corpusId, "from account", req.cookies[sessioncookie]);
+
+    req.db.collection(userdbname).update({_id: req.cookies[sessioncookie]}, {$pull: {subscribed: req.params.corpusId}}, function (e, docs) {
+        console.log("Subscription removal completed.\n\tErrors: ", e,
+            "\n\tEntries found during subscription search: \n\t" + ((JSON.stringify(docs, undefined, "\t")).replace(/\n/g, "\n\t")));
+    });
+    req.db.collection(corporadbname).update({_id: req.params.corpusId}, {$pull: {subscribed: req.cookies[sessioncookie]}}, function (e, docs) {
+        console.log("Subscription removal completed.\n\tErrors: ", e,
+            "\n\tEntries found during subscription search: \n\t" + ((JSON.stringify(docs, undefined, "\t")).replace(/\n/g, "\n\t")));
+    });
+    res.status(204).end();
 });
 
 //endregion
