@@ -70,9 +70,6 @@ router.get('/client/corpora/:corpusIdList/simple', function(req, res, next){
 router.get('/client/analyze/:corpusId/:scriptNum/simple/', function(req, res, next){
 	
 });
-router.post('/client', function(req, res, next){
-	
-});
 router.get('/client/search/corpora', function(req, res, next){
 	
 });

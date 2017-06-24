@@ -1,21 +1,22 @@
 //region Imports
 
 //Basic setup
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 //View engine for dynamic compiling
-var jade = require('pug');
+const jade = require('pug');
 
 //Path and fs for launching systems
-var path = require("path");
-var fs = require('fs');
+const path = require("path");
+const fs = require('fs');
 
 //Spawn additional threads for heavy number crunching
-var childProcess = require('child_process');
+const childProcess = require('child_process');
+const cmd = require('node-cmd');
 
 //For file uploads -- Node does the IO issue well
-var multer  = require('multer');
+const multer = require('multer');
 
 //endregion
 
@@ -32,14 +33,14 @@ const sessioncookie = 'logintoken';
 //region Template functions
 
 //Generated templates
-var searchFn = false;
-var sidebarFn = false;
-var profileOwnedFn = false;
-var profileSubscribedFn = false;
+let searchFn = false;
+let sidebarFn = false;
+let profileOwnedFn = false;
+let profileSubscribedFn = false;
 //TODO refactor out the repeated code
 function genTemplates() {
     console.log("Generating client-side jade javascript functions.");
-    var templatePath = path.normalize(path.join(__dirname.substr(0, __dirname.lastIndexOf(path.sep)), 'views', 'app-search-entry.pug'));
+    let templatePath = path.normalize(path.join(__dirname.substr(0, __dirname.lastIndexOf(path.sep)), 'views', 'app-search-entry.pug'));
     fs.readFile(templatePath, "ASCII", function (err, data) {
         console.log("Generating client-side search entry templates.");
         if (err !== null) console.log("Error from file read:", err);
@@ -71,7 +72,7 @@ genTemplates();
 //region Login and sign up account methods
 
 function signup(db, enteredAccount, response) {
-    var users = db.collection(userdbname);
+    const users = db.collection(userdbname);
     console.log("Searching database for accounts with this email or username.");
     users.find({ $or : [{"username" : enteredAccount.username}, {"email" : enteredAccount.email}]}, {}, function(e, docs) {
         console.log("Sign up query completed.\n\tErrors: ", e,
@@ -164,7 +165,7 @@ function findAccount(db, query, callback) {
 
 //Testing database
 router.get('/accounts', function(request, response) {
-    var dbusers = request.db.collection(userdbname);
+    const dbusers = request.db.collection(userdbname);
     dbusers.find(request.query, {}, function (e, docs) { //docs: document data, e: last entry...?
         console.log("Database error: ", e);
         console.log("Located records: ", docs);
@@ -283,7 +284,7 @@ router.get('/client/search', function(req, res){
 });
 router.get('/client/search/corpora', function(req, res){
     //TODO improve searches
-    var query = {};
+    let query = {};
     if (req.query.main_input !== undefined && req.query.main_input !== null) {
         query.name = req.query.main_input;
     } else {
@@ -305,6 +306,32 @@ router.get('/client/analyze/:corpusId/:rScriptId/simple/', function(req, res, ne
     //TODO run R scripts on the input data when analysis requested
     //TODO glean results when script finishes running
 });
+/*router.get('/client/testcmd', (req, res, next) => {
+    const ls = childProcess.spawn('ls', ['./', '-lh']);
+    ls.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+    ls.stderr.on('data', (data) => {
+        console.log(`stderr: ${data}`);
+    });
+    ls.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+    });
+    ls.on('error', (err) => {
+        console.log(`Failed to start child process, ${err}.`);
+    });
+    const pyProcess = cmd.get('C:\\Users\\benbe\\AppData\\Local\\Programs\\Python\\Python35-32\\pythonw.exe' +
+        ' C:\\Users\\benbe\\Documents\\code-switch-resource\\route-generator.py',
+        function (data, err, stderr) {
+            if (!err) {
+                console.log("data from python script " + data)
+            } else {
+                console.log("python script cmd error: " + err)
+            }
+        }
+    );
+    res.end("Yah, k");
+});*/
 
 //endregion
 //region Owned and subscribed corpora

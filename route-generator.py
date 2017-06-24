@@ -11,3 +11,5 @@ with open('./mainlisting.genroutes', 'w') as outfile:
             # is a path
             line = line.split()
             outfile.write("router." + line[0].lower() + "('" + line[1] + "', function(req, res, next){\n\t\n});\n")
+
+sys.exit()
