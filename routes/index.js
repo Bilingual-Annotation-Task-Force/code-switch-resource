@@ -306,8 +306,8 @@ router.get('/client/analyze/:corpusId/:rScriptId/simple/', function(req, res, ne
     //TODO run R scripts on the input data when analysis requested
     //TODO glean results when script finishes running
 });
-/*router.get('/client/testcmd', (req, res, next) => {
-    const ls = childProcess.spawn('ls', ['./', '-lh']);
+router.get('/client/testcmd', (req, res, next) => {
+    let ls = childProcess.exec('dir');
     ls.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);
     });
@@ -320,18 +320,22 @@ router.get('/client/analyze/:corpusId/:rScriptId/simple/', function(req, res, ne
     ls.on('error', (err) => {
         console.log(`Failed to start child process, ${err}.`);
     });
-    const pyProcess = cmd.get('C:\\Users\\benbe\\AppData\\Local\\Programs\\Python\\Python35-32\\pythonw.exe' +
-        ' C:\\Users\\benbe\\Documents\\code-switch-resource\\route-generator.py',
-        function (data, err, stderr) {
-            if (!err) {
-                console.log("data from python script " + data)
-            } else {
-                console.log("python script cmd error: " + err)
-            }
-        }
-    );
+    let py = childProcess.exec('C:\\Users\\benbe\\AppData\\Local\\Programs\\Python\\Python36-32\\pythonw.exe' +
+        ' C:\\Users\\benbe\\Documents\\Programming\\Work\\code-switch-resource\\route-generator.py');
+    py.stdout.on('data', (data) => {
+        console.log(`STDERR\n${data}\nSTDOUT END\n`);
+    });
+    py.stderr.on('data', (data) => {
+        console.log(`STDERR\n${data}\nSTDERR END\n`);
+    });
+    py.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+    });
+    py.on('error', (err) => {
+        console.log(`Failed to start child process, ${err}.`);
+    });
     res.end("Yah, k");
-});*/
+});
 
 //endregion
 //region Owned and subscribed corpora
